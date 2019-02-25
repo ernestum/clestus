@@ -11,7 +11,7 @@ function reset_target() {
 }
 
 function setup() {
-  createCanvas(720, 400);
+  createCanvas(windowWidth, windowHeight);
   
   background(255);
   reset_target();
@@ -54,9 +54,9 @@ function registerMouse() {
 }
 
 function saveOffsets() {
-  string_list = ["x,y,distance"];
+  string_list = ["x y distance\r"];
   for( var i = 0; i < offsets.length; i++ ) {
-    string_list.push(offsets[i][0] + "," + offsets[i][1] + "," + dist(0, 0, offsets[i][0], offsets[i][1]));  
+    string_list.push(round(offsets[i][0]) + " " + round(offsets[i][1]) + " " + round(dist(0, 0, offsets[i][0], offsets[i][1])) + "\r");  
   }
   saveStrings(string_list, "data", "csv");
 }  
@@ -88,4 +88,8 @@ function std(distances) {
     sum += (m - distances[i])**2;
   }
   return sqrt(sum/distances.length);
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }
