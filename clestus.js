@@ -54,11 +54,11 @@ function registerMouse() {
 }
 
 function saveOffsets() {
-  string_list = [];
+  string_list = ["x,y,distance"];
   for( var i = 0; i < offsets.length; i++ ) {
-    string_list.push(offsets[i][0] + "\t" + offsets[i][1] + "\t" + dist(0, 0, offsets[i][0], offsets[i][1]));  
+    string_list.push(offsets[i][0] + "," + offsets[i][1] + "," + dist(0, 0, offsets[i][0], offsets[i][1]));  
   }
-  saveStrings(string_list, "data.txt");
+  saveStrings(string_list, "data", "csv");
 }  
 
 
