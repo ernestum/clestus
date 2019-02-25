@@ -1,8 +1,9 @@
 var target_x;
 var target_y;
 
-var initial_target_range = 0.2; // 0 means always in the middle, 1 means spread over the whole screen
+var initial_target_range = 0.5; // 0 means always in the middle, 1 means spread over the whole screen
 var distances = [];
+var offsets = [];
 
 function reset_target() {
   target_x = random(width*(1-initial_target_range)/2, width*(1-(1-initial_target_range)/2));
@@ -19,20 +20,57 @@ function setup() {
 
 function draw() {
   background(255);
-  fill(255, 0, 0);
   noStroke();
+  
+  
+  
+  if(keyIsPressed && key == 'v') {
+    fill(200);
+    rect(width*(1-initial_target_range)/2, 
+         height*(1-initial_target_range)/2, 
+         width*(1-(1-initial_target_range)), 
+         height*(1-(1-initial_target_range)));
+    fill(100);
+    for( var i = 0; i < offsets.length; i++ ) {
+      ellipse(target_x - offsets[i][0],target_y - offsets[i][1], 10, 10);
+    }
+    fill(0);
+    text("Distance\nmean: " + round(mean(distances)) + "\nstd: " + round(std(distances)), 10, 20);
+  }
+  
+  fill(255, 0, 0);
   ellipse(target_x, target_y, 10, 10);
+  
   noFill();
   stroke(0);
   rect(0, 0, width-1, height-1);
-  text("Distance mean: " + mean(distances) + " std: " + std(distances), 10, 20);
+  
 }
 
+function registerMouse() {
+  distance = dist(mouseX, mouseY, target_x, target_y);
+  distances.push(distance);  
+  offsets.push([target_x - mouseX, target_y - mouseY]);
+}
+
+function saveOffsets() {
+  string_list = [];
+  for( var i = 0; i < offsets.length; i++ ) {
+    string_list.push(offsets[i][0] + "\t" + offsets[i][1] + "\t" + dist(0, 0, offsets[i][0], offsets[i][1]));  
+  }
+  saveStrings(string_list, "data.txt");
+}  
+
+
 function mouseReleased() {
- distance = dist(mouseX, mouseY, target_x, target_y);
- distances.push(distance);
- 
- print("Distance mean: " + mean(distances) + " std: " + std(distances));
+ registerMouse();
+ reset_target();
+}
+
+function keyReleased() {
+ if(key == 'S') {
+   saveOffsets();
+ }
 }
 
 function mean(distances) {
