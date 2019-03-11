@@ -1,4 +1,4 @@
-## Citing the this software
+## Citing this software
 
 If you use this software for your scientific research please cite it using
 ```bibtex
