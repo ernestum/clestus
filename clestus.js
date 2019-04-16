@@ -31,11 +31,11 @@ function drawInfo() {
   strokeWeight(3);
   line(height/2, height/2, width-height/2, height/2);
   strokeWeight(1);
-  fill(100, 30);
-  for ( var i = 0; i < samples.length; i++ ) {
-    var s = samples[i];
-    ellipse(target_x + s.guessed_target_x - s.target_x, target_y + s.guessed_target_y - s.target_y, s.guessed_radius*2, s.guessed_radius*2);
-  }
+  //fill(100, 30);
+  //for ( var i = 0; i < samples.length; i++ ) {
+  //  var s = samples[i];
+  //  ellipse(target_x + s.guessed_target_x - s.target_x, target_y + s.guessed_target_y - s.target_y, s.guessed_radius*2, s.guessed_radius*2);
+  //}
   fill(0);
   text("n: " + samples.length + "\nstate: " + state + "\n\n" + key_documentation, 10, 20);
 }
