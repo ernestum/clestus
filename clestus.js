@@ -1,22 +1,59 @@
 var target_x;
 var target_y;
+var guessed_target_x;
+var guessed_target_y;
+var guessed_radius;
 
-var initial_target_range = 0.5; // 0 means always in the middle, 1 means spread over the whole screen
-var distances = [];
-var offsets = [];
+var samples = [];
 
 var displayInfo = false;
+var state = 0;
 
-function resetTarget() {
-  target_x = random(width*(1-initial_target_range)/2, width*(1-(1-initial_target_range)/2));
-  target_y = random(height*(1-initial_target_range)/2, height*(1-(1-initial_target_range)/2));
+function reset() {
+  state = 0;
+  target_x = random(height/2, width-height/2);
+  target_y = height/2;
+  guessed_target_x = -1;
+  guessed_target_y = -1;
+  guessed_radius = height/2;
+  print("reset!");
 }
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-
   background(255);
-  resetTarget();
+  reset();
+}
+
+function drawInfo() {
+  fill(200);
+  stroke(0);
+  strokeWeight(3);
+  line(height/2, height/2, width-height/2, height/2);
+  strokeWeight(1);
+  fill(100, 30);
+  for ( var i = 0; i < samples.length; i++ ) {
+    var s = samples[i];
+    ellipse(target_x + s.guessed_target_x - s.target_x, target_y + s.guessed_target_y - s.target_y, s.guessed_radius*2, s.guessed_radius*2);
+  }
+  fill(0);
+  text("n: " + samples.length + "\nstate: " + state + "\n\n" + key_documentation, 10, 20);
+}
+
+function drawTarget() {
+  noStroke();
+  fill(255, 0, 0);
+  ellipse(target_x, target_y, 10, 10);
+}
+
+function drawConfidenceCircle() {
+  noFill();
+  stroke(0);
+  ellipse(target_x, target_y, guessed_radius*2, guessed_radius*2);
+}
+
+function mouseDragged() {
+  guessed_radius = min(height/2, dist(mouseX, mouseY, target_x, target_y));
 }
 
 
@@ -25,63 +62,77 @@ function draw() {
   noStroke();
 
   if (displayInfo) {
-    fill(200);
-    rect(width*(1-initial_target_range)/2, 
-      height*(1-initial_target_range)/2, 
-      width*(1-(1-initial_target_range)), 
-      height*(1-(1-initial_target_range)));
-    fill(100);
-    for ( var i = 0; i < offsets.length; i++ ) {
-      ellipse(target_x - offsets[i][0], target_y - offsets[i][1], 10, 10);
-    }
-    fill(0);
-    text("Distance\nn: " + distances.length + "\nmean: " + round(mean(distances)) + "\nstd: " + round(std(distances)) + "\n\n" + key_documentation, 10, 20);
+    drawInfo();
   }
 
-  fill(255, 0, 0);
-  ellipse(target_x, target_y, 10, 10);
+  if (state == 0) {
+    drawTarget();
+  }
+
+  if (state == 1) {
+    drawTarget();
+    drawConfidenceCircle();
+  }
 
   noFill();
-  stroke(0);
   rect(0, 0, width-1, height-1);
 }
 
-function registerMouse() {
-  distance = dist(mouseX, mouseY, target_x, target_y);
-  distances.push(distance);  
-  offsets.push([target_x - mouseX, target_y - mouseY]);
-}
-
-function deleteLastEntry() {
-  distances.pop();
-  offsets.pop();
-}
-
-function saveOffsets() {
-  string_list = ["x y distance\r"];
-  for ( var i = 0; i < offsets.length; i++ ) {
-    string_list.push(round(offsets[i][0]) + " " + round(offsets[i][1]) + " " + round(dist(0, 0, offsets[i][0], offsets[i][1])) + "\r");
+function saveSamples() {
+  string_list = ["target_x target_y guessed_target_x guessed_target_y guessed_radius\r"];
+  for ( var i = 0; i < samples.length; i++ ) {
+    var s = samples[i];
+    string_list.push(s.target_x + " " + s.target_y + " " + s.guessed_target_x + " " + s.guessed_target_y + " " + s.guessed_radius + "\r");
   }
   saveStrings(string_list, "data", "csv");
 }  
 
-var key_documentation = "s: save data\na: register position\nw: new random target\nd: delete last sample";
+var key_documentation = "s: save data\na: abort current sample\nd: delete last sample\nv: show this info\nn: next";
 
 function keyReleased() {
-  if (key == 'S') {
-    saveOffsets();
-  }
   if (key == 'A') {
-    registerMouse();
+    reset();
   }
-  if (key == 'W') {
-    resetTarget();
-  }
+
   if (key == 'D') {
-    deleteLastEntry();
+    samples.pop();
   }
   if (key == 'V') {
     displayInfo = false;
+  }
+
+  if (key == 'S') {
+    saveSamples();
+  }
+
+  if (state == 0) {
+    if (key == 'N') {
+      guessed_target_x = mouseX;
+      guessed_target_y = mouseY;
+      state = 1;
+      print("going to state 1");
+      return;
+    }
+  }
+
+  if (state == 1) {
+    if (key == 'N') {
+      samples.push( {
+      target_x: 
+        target_x, 
+        target_y: 
+        target_y, 
+        guessed_target_x: 
+        guessed_target_x, 
+        guessed_target_y: 
+        guessed_target_y, 
+        guessed_radius: 
+        guessed_radius
+      }
+      );
+      reset();
+      return;
+    }
   }
 }
 
@@ -91,23 +142,7 @@ function keyPressed() {
   }
 }
 
-function mean(distances) {
-  var sum = 0;
-  for ( var i = 0; i < distances.length; i++ ) {
-    sum += distances[i];
-  }
-  return sum/distances.length;
-}
-
-function std(distances) {
-  var m = mean(distances);
-  var sum = 0;
-  for ( var i = 0; i < distances.length; i++ ) {
-    sum += pow((m - distances[i]), 2);
-  }
-  return sqrt(sum/distances.length);
-}
-
 function windowResized() {
+  //TODO: put a warning here?
   resizeCanvas(windowWidth, windowHeight);
 }
