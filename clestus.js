@@ -68,8 +68,12 @@ function draw() {
   if (state == 0) {
     drawTarget();
   }
-
+  
   if (state == 1) {
+    drawTarget();
+  }
+
+  if (state == 2) {
     drawTarget();
     drawConfidenceCircle();
   }
@@ -114,8 +118,16 @@ function keyReleased() {
       return;
     }
   }
-
+  
   if (state == 1) {
+    if (key == 'N') {
+      state = 2;
+      print("going to state 2");
+      return;
+    }
+  }
+
+  if (state == 2) {
     if (key == 'N') {
       samples.push( {
       target_x: 
