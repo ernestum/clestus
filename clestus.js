@@ -53,7 +53,9 @@ function drawConfidenceCircle() {
 }
 
 function mouseDragged() {
-  guessed_radius = min(height/2, dist(mouseX, mouseY, target_x, target_y));
+  if (state == 2) {
+    guessed_radius = min(height/2, dist(mouseX, mouseY, target_x, target_y));
+  }
 }
 
 
@@ -68,7 +70,7 @@ function draw() {
   if (state == 0) {
     drawTarget();
   }
-  
+
   if (state == 1) {
     drawTarget();
   }
@@ -118,7 +120,7 @@ function keyReleased() {
       return;
     }
   }
-  
+
   if (state == 1) {
     if (key == 'N') {
       state = 2;
