@@ -85,13 +85,14 @@ function draw() {
 }
 
 function saveSamples() {
-  string_list = ["target_x target_y guessed_target_x guessed_target_y guessed_radius\r"];
+  var string_list = ["target_x target_y guessed_target_x guessed_target_y guessed_radius tapped_radius\r"];
   for ( var i = 0; i < samples.length; i++ ) {
     var s = samples[i];
-    string_list.push(s.target_x + " " + s.target_y + " " + s.guessed_target_x + " " + s.guessed_target_y + " " + s.guessed_radius + "\r");
+    var tapped_radius = min(s.target_y, dist(s.target_x, s.target_y, s.guessed_target_x, s.guessed_target_y));
+    string_list.push(s.target_x + " " + s.target_y + " " + s.guessed_target_x + " " + s.guessed_target_y + " " + s.guessed_radius + " " + tapped_radius + "\r");
   }
   saveStrings(string_list, "data", "csv");
-}  
+}
 
 var key_documentation = "s: save data\na: abort current sample\nd: delete last sample\nv: show this info\nn: next";
 
