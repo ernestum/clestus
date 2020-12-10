@@ -8,6 +8,6 @@ If you use this software for your scientific research please cite it using
       year = {2019},
       publisher = {GitHub},
       journal = {GitHub repository},
-      howpublished = {\url{https://github.com/erniejunior/clestus}},
+      howpublished = {\url{https://github.com/ernestum/clestus}},
     }
 ``` 
